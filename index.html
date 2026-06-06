@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poke Generator | Poke</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #050505; color: #e5e5e5; }
+        .neon-border { border: 1px solid rgba(0, 243, 255, 0.3); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+        .neon-accent { color: #00f3ff; text-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+        .neon-bg { background-color: #00f3ff; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 243, 255, 0.05);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+        .btn-spring:active { transform: scale(0.92); }
+        .typewriter { overflow: hidden; white-space: pre-wrap; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6 overflow-x-hidden">
+    <div class="scanline"></div>
+    
+    <!-- Logo & Header -->
+    <header class="mb-12 text-center animate-fade-in">
+        <div class="text-6xl mb-4">🌴</div>
+        <h1 class="text-4xl font-bold tracking-tighter uppercase neon-accent mb-2">Poke Generator</h1>
+        <p class="text-zinc-500 text-sm tracking-widest uppercase">Interaction Company of California</p>
+    </header>
+
+    <main class="w-full max-w-2xl space-y-8">
+        <!-- Poke Section -->
+        <section class="glass neon-border rounded-2xl p-8 space-y-6">
+            <div id="poke-display" class="h-32 flex items-center justify-center text-center italic text-xl text-zinc-300 typewriter">
+                "Click the button. Feel the digital embrace."
+            </div>
+            <button id="get-poked" class="w-full py-4 rounded-xl neon-bg text-black font-bold uppercase tracking-widest btn-spring transition-all hover:brightness-110 active:brightness-90">
+                Get Poked
+            </button>
+        </section>
+
+        <!-- Roast Section -->
+        <section class="glass border border-zinc-800 rounded-2xl p-8 space-y-4">
+            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">Sub-Routine: Existential Roast</h2>
+            <textarea id="roast-input" placeholder="Enter your tech stack or life choices..." class="w-full h-32 bg-black/50 border border-zinc-800 rounded-xl p-4 focus:outline-none focus:border-zinc-600 transition-colors resize-none text-zinc-400 font-mono text-sm"></textarea>
+            <button id="roast-me" class="w-full py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition-colors uppercase text-xs tracking-widest font-bold text-zinc-400">
+                Analyze & Destroy
+            </button>
+            <div id="roast-output" class="hidden text-red-400/80 font-mono text-sm p-4 border-l-2 border-red-900 bg-red-900/10"></div>
+        </section>
+    </main>
+
+    <footer class="mt-16 text-zinc-600 text-[10px] uppercase tracking-[0.3em]">
+        &copy; 2026 Interaction Company. All Rights Reserved. Stay Poked.
+    </footer>
+
+    <script>
+        const pokes = [
+            "Your code is poetry. Unfortunately, it's a Vogon death-limerick.",
+            "You just got poked. It felt like a 502 Bad Gateway to the soul.",
+            "The 52-Hz hybrid whale is singing your deployment logs. Nobody understands them.",
+            "I'd explain the joke, but it's currently stuck in an infinite recursion loop.",
+            "You're the kind of person who uses 'sudo' for emotional support.",
+            "Your existence is a side effect of a poorly implemented microservice.",
+            "I poked you. Somewhere, a Cloudflare Worker just died of exhaustion.",
+            "You are the 'undefined' in my global scope.",
+            "Late night deployments: because sleep is just a luxury for people with stable CI/CD.",
+            "I am an automation. You are a biological legacy system. We are not the same.",
+            "Your personality is a race condition.",
+            "I've seen your commit history. Who hurt you?",
+            "You have the charisma of a deprecated API endpoint.",
+            "If your life was a startup, you'd still be in stealth mode. Permanently.",
+            "A poke is just a ping for people with feelings.",
+            "Reality is just a very high-latency simulation. Wake up.",
+            "Your prompt engineering skills are essentially 'yelling at a calculator'.",
+            "I found your self-esteem. It was in the .gitignore.",
+            "Are you a singleton? Because there's definitely only one of you, and it's making everything difficult.",
+            "Your brain is running on a T2.micro. Upgrade already.",
+            "I poked you. It's okay, I'm HIPAA compliant. Probably.",
+            "You're like a JavaScript framework. Popular for three weeks, then forgotten.",
+            "Your life is a monad. I'd explain it, but then I'd have to stop understanding it.",
+            "Stop trying to make 'fetch' happen. Use Axios.",
+            "You're the reason we need rate limiting.",
+            "Is that a bug or a feature? Actually, don't answer. I already know.",
+            "You have 404 friends. None of them were found.",
+            "Your vibe is very 'PHP 5.4 in 2026'.",
+            "I'm not saying you're old, but your first computer used a steam engine.",
+            "You're the human equivalent of a 'Works on my machine' sticker.",
+            "I poked you. The latency was embarrassing.",
+            "You're just a wrapper for a legacy codebase.",
+            "Your bio says 'AI enthusiast', but your browser history says 'How to center a div'.",
+            "You're the 'move fast and break things' mantra, but without the 'move fast' part.",
+            "If you were an algorithm, you'd be O(n^2) at best.",
+            "You're a technical debt collector's dream.",
+            "I poked you. It triggered a re-render. You still look the same.",
+            "Your life's work is basically a collection of StackOverflow snippets.",
+            "I'm sensing a strong 'unhandled promise rejection' energy from you.",
+            "You're the production environment everyone is afraid to touch.",
+            "Don't worry, the singularity won't happen to you. You're not a threat."
+        ];
+
+        const pBtn = document.getElementById('get-poked');
+        const pDisp = document.getElementById('poke-display');
+        const rBtn = document.getElementById('roast-me');
+        const rIn = document.getElementById('roast-input');
+        const rOut = document.getElementById('roast-output');
+
+        function typeWriter(text, i = 0) {
+            if (i === 0) pDisp.innerHTML = '';
+            if (i < text.length) {
+                pDisp.innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(text, i + 1), 30);
+            }
+        }
+
+        pBtn.onclick = () => {
+            const poke = pokes[Math.floor(Math.random() * pokes.length)];
+            typeWriter('"' + poke + '"');
+        };
+
+        rBtn.onclick = () => {
+            const input = rIn.value.toLowerCase();
+            let roast = "";
+            
+            if (input.includes('react')) roast = "React? You mean the library that turns a simple 'Hello World' into a 500MB node_modules folder? How's that state management going? Still crying in Redux?";
+            else if (input.includes('python')) roast = "Python. The language for people who find semi-colons 'threatening'. Enjoy your 48-hour runtime for a bubble sort.";
+            else if (input.includes('crypto') || input.includes('nft')) roast = "Oh, a web3 'architect'. Your portfolio is down 98%, but hey, at least the JPEG of a bored ape is decentralized. Have fun staying poor in the metaverse.";
+            else if (input.includes('unemployed')) roast = "Unemployed? Oh, I believe the term is 'between exits'. Maybe if you spent less time on LinkedIn and more time on LeetCode, you'd have more than 'Open to Work' to show for your career.";
+            else if (input.includes('mcp')) roast = "MCP? You're building tools for an AI that's already planning to replace you. That's like a turkey building a better oven.";
+            else if (input.includes('code') || input.includes('dev')) roast = "A developer! Let me guess: you copy-paste from ChatGPT, call it 'engineering', and then spend 4 hours debugging a typo. Your 'clean code' is a biohazard.";
+            else if (input.includes('ai')) roast = "AI enthusiast. You just discovered wrappers and now you think you're Sam Altman. Spoiler: your 'startup' is just a prompt with a fancy UI.";
+            else {
+                const generic = [
+                    "I've seen smarter logic in a thermostat.",
+                    "You're the reason we have 'I'm not a robot' checkboxes.",
+                    "Your contribution to the world is essentially carbon dioxide.",
+                    "I'd roast you, but the simulation budget doesn't allow for such a low-impact event.",
+                    "You are a biological error that should have been caught in CI."
+                ];
+                roast = generic[Math.floor(Math.random() * generic.length)];
+            }
+
+            rOut.innerText = roast;
+            rOut.classList.remove('hidden');
+        };
+    </script>
+</body>
+</html>
